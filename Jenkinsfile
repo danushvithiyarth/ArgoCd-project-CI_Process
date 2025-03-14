@@ -14,10 +14,11 @@ pipeline {
         stage('OWASP-check') {
             steps {
                 dependencyCheck additionalArguments: '''
-                    --scan \\\'./\\\'
-                    --out \\\'./\\\'
-                    --format \\\'ALL\\\'
-                    --prettyPrint ''', odcInstallation: 'OWASP-checker'
+                  --scan ./ 
+                  --out ./ 
+                  --format ALL 
+                  --prettyPrint
+                ''', odcInstallation: 'OWASP-checker'
             }
         }
     }
