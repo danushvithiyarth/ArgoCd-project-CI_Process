@@ -10,7 +10,7 @@ pipeline {
             steps {
                 sh 'mvn clean install'
             }
-        }}
+        }
         stage('OWASP-check') {
             steps {
                 dependencyCheck additionalArguments: '''
