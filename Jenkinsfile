@@ -13,13 +13,14 @@ pipeline {
         }
         stage('OWASP-check') {
             steps {
+                sh 'rm -rf ~/.dependency-check/data && dependency-check.sh --updateonly'
                 dependencyCheck additionalArguments: '''
-                  --scan ./ 
-                  --out ./ 
-                  --format ALL 
-                  --prettyPrint
+                 --scan .
+                 --out ./
+                 --format ALL
+                 --prettyPrint
                 ''', odcInstallation: 'OWASP-checker'
-            }
+          }
         }
     }
 }
