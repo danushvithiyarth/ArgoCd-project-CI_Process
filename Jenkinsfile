@@ -12,7 +12,7 @@ pipeline {
             }
         }
         stage('OWASP-check') {
-            ssteps {
+            steps {
                 dependencyCheck additionalArguments: '''
                  --scan .
                  --out ./dependency-check-report
