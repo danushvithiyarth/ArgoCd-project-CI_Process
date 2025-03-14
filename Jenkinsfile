@@ -1,20 +1,23 @@
 pipeline {
     agent any
+    tools{
+        maven 'maven-3.9'
+    }
+
 
     stages {
-        stage('Build') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Building..'
+                sh 'mvn clean install'
             }
-        }
-        stage('Test') {
+        }}
+        stage('OWASP-check') {
             steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
+                dependencyCheck additionalArguments: '''
+                    --scan \\\'./\\\'
+                    --out \\\'./\\\'
+                    --format \\\'ALL\\\'
+                    --prettyPrint ''', odcInstallation: 'OWASP-checker'
             }
         }
     }
