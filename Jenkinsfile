@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "danushvithiyarth/argocdproject"
         IMAGE_VERSION = "v${BUILD_NUMBER}"
     }
@@ -21,7 +22,7 @@ pipeline {
             steps {
                 dependencyCheck additionalArguments: '''--scan target/ 
                   --format ALL 
-                  --apiKey "dedd5531-0050-4e00-b986-06348bdde990"
+                  --nvdApiKey "dedd5531-0050-4e00-b986-06348bdde990"
                 ''', odcInstallation: 'owasp-checker'
             }
         }
