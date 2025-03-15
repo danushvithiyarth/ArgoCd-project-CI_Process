@@ -3,6 +3,8 @@ pipeline {
 
     tools {
         maven 'maven-3.9'
+        IMAGE_NAME = "danushvithiyarth/argocdproject"
+        IMAGE_VERSION = "v${BUILD_NUMBER}"
     }
 
     stages {
@@ -14,9 +16,10 @@ pipeline {
 
         stage('OWASP-check') {
             steps {
-                dependencyCheck additionalArguments: '''
-                    --scan target/
-                    --format ALL
+                sh 'rm -rf ~/.dependency-check/data && dependency-check.sh --updateonly --apiKey "dedd5531-0050-4e00-b986-06348bdde990"'
+                dependencyCheck additionalArguments: '''--scan target/ 
+                  --format ALL 
+                  --apiKey "your-actual-api-key-here"
                 ''', odcInstallation: 'owasp-checker'
             }
         }
@@ -32,6 +35,20 @@ pipeline {
                         -Dsonar.java.binaries=target/classes
                     '''     
                 }
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "docker build"
+                sh 'docker image prune -f'
+                sh 'docker build -t $IMAGE_NAME:$IMAGE_VERSION -t $IMAGE_NAME:latest .'
+'
+            }
+        }
+        stage('Trivy-Check') {
+            steps {
+                echo "trivy scan"
+                sh 'trivy image --format table -o report.html $IMAGE_NAME:$IMAGE_VERSION'
             }
         }
     }
