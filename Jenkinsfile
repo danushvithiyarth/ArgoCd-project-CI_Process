@@ -53,8 +53,9 @@ pipeline {
             steps {
                 echo "trivy scan"
                 sh "trivy image --format table -o report.html ${IMAGE_NAME}:${IMAGE_VERSION}"
-            }
-        }
+              }
+          }
+       }
         post {
             always {
                 publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', 
@@ -63,7 +64,6 @@ pipeline {
                 publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './',
                              reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
             }
-       }
-
+        }
     }
 }
