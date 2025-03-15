@@ -65,5 +65,4 @@ pipeline {
                              reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
             }
         }
-    }
 }
