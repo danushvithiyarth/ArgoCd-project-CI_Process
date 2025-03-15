@@ -19,7 +19,6 @@ pipeline {
 
         stage('OWASP-check') {
             steps {
-                sh 'rm -rf ~/.dependency-check/data && dependency-check.sh --updateonly --apiKey "dedd5531-0050-4e00-b986-06348bdde990"'
                 dependencyCheck additionalArguments: '''--scan target/ 
                   --format ALL 
                   --apiKey "dedd5531-0050-4e00-b986-06348bdde990"
