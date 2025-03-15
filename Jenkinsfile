@@ -59,10 +59,10 @@ pipeline {
         post {
             always {
                 publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', 
-                             reportFiles: 'dependency-check-jenkins.html', reportName: 'HTML Report', reportTitles: '', 
+                             reportFiles: 'dependency-check-jenkins.html', reportName: 'OWASP Report', reportTitles: '', 
                              useWrapperFileDirectly: true])
                 publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './',
-                             reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                             reportFiles: 'report.html', reportName: 'Trivy Report', reportTitles: '', useWrapperFileDirectly: true])
             }
         }
 }
