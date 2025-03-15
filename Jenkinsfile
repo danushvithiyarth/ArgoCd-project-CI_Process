@@ -68,11 +68,7 @@ pipeline {
         stage('Push Image') {
             steps {
                 timeout(time: 1, unit: 'DAYS') {
-                    input {
-                        message 'Is the application build ok?'
-                        ok 'Approved'
-                        submitter 'admin'
-                    }
+                    input message: 'Is the application build ok?', ok: 'Approved', submitter: 'admin'
                 }
             }
         }
