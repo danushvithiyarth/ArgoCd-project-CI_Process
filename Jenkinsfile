@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
-                echo "Install Depenadancy"
+                echo "Install Dependency"
                 sh 'mvn clean install'
             }
         }
@@ -57,39 +57,43 @@ pipeline {
                 sh "trivy image --format table -o report.html ${IMAGE_NAME}:${IMAGE_VERSION}"
             }
         }
+
         stage('Test application') {
             steps {
                 echo "Application testing"
                 sh "docker run -d --name=test-application -p 80:80 ${IMAGE_NAME}:${IMAGE_VERSION}"
-              }
-        }
-        stage('Push Image') {
-            steps {
-                timeout(time: 1, unit: 'DAYS'){
-                    input {
-                       message 'Is the application build ok?'
-                       ok 'Approved '
-                       submitter 'admin'
-                   }
-                }      
             }
         }
+
+        stage('Push Image') {
+            steps {
+                timeout(time: 1, unit: 'DAYS') {
+                    input {
+                        message 'Is the application build ok?'
+                        ok 'Approved'
+                        submitter 'admin'
+                    }
+                }
+            }
+        }
+
         stage('DockerHub image push') {
             steps {
                 echo "DockerHub Push"
                 sh "docker rm -f test-application"
                 sh 'docker login -u "danushvithiyarth" -p "$Docker_pass" docker.io'
                 sh "docker push ${IMAGE_NAME} --all-tags"
-              }
-        }
-       }
-        post {
-            always {
-                publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', 
-                             reportFiles: 'dependency-check-jenkins.html', reportName: 'OWASP Report', reportTitles: '', 
-                             useWrapperFileDirectly: true])
-                publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './',
-                             reportFiles: 'report.html', reportName: 'Trivy Report', reportTitles: '', useWrapperFileDirectly: true])
             }
         }
+    }
+
+    post {
+        always {
+            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', 
+                         reportFiles: 'dependency-check-jenkins.html', reportName: 'OWASP Report', reportTitles: '', 
+                         useWrapperFileDirectly: true])
+            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './',
+                         reportFiles: 'report.html', reportName: 'Trivy Report', reportTitles: '', useWrapperFileDirectly: true])
+        }
+    }
 }
