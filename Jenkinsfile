@@ -46,7 +46,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "docker build"
-                sh 'docker image prune -a'
+                sh 'docker image prune -af'
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_VERSION} -t ${IMAGE_NAME}:latest ."
             }
         }
@@ -77,7 +77,9 @@ pipeline {
             steps {
                 echo "DockerHub Push"
                 sh "docker rm -f test-application"
-                sh 'docker login -u "danushvithiyarth" -p "$Docker_pass" docker.io'
+                withCredentials([usernamePassword(credentialsId: 'Docker_pass', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                      sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} docker.io"
+                }
                 sh "docker push ${IMAGE_NAME} --all-tags"
             }
         }
