@@ -1,9 +1,9 @@
 pipeline {
     agent any
-    tools{
+
+    tools {
         maven 'maven-3.9'
     }
-
 
     stages {
         stage('Install Dependencies') {
@@ -11,33 +11,29 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
+
         stage('OWASP-check') {
             steps {
-              sh 'rm -rf ~/.dependency-check/data'  // Force CVE database refresh
-              sh '/opt/dependency-check/bin/dependency-check.sh --updateonly'  // Ensure latest CVE data
-
-              dependencyCheck additionalArguments: '''
-                --scan .
-                --out ./dependency-check-report
-                --format ALL
-                --prettyPrint
-              ''', odcInstallation: 'OWASP-checker'
-          }
+                dependencyCheck additionalArguments: '''
+                    --scan target/
+                    --format ALL
+                ''', odcInstallation: 'owasp-checker'
+            }
         }
+
         stage('SonarQube-analysis') { 
             steps {
-                script {
-                    echo "Sonar scanner"
-                    withSonarQubeEnv('sonar-server') {
+                echo "Sonar scanner"
+                withSonarQubeEnv('sonar-server') {
                     sh '''
-                      ${SCANNER_HOME}/bin/sonar-scanner \
-                      -Dsonar.projectKey=javakey \
-                      -Dsonar.projectName=java-app \
-                       -Dsonar.java.binaries=target/classes
-                     '''
-                    }     
+                        ${SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=argo-project \
+                        -Dsonar.projectName=argo-project \
+                        -Dsonar.java.binaries=target/classes
+                    '''     
                 }
-           }
+            }
         }
     }
 }
+
