@@ -14,12 +14,14 @@ pipeline {
     stages {
         stage('Install Dependencies') {
             steps {
+                echo "Install Depenadancy"
                 sh 'mvn clean install'
             }
         }
 
         stage('OWASP-check') {
             steps {
+                echo "OWASP check"
                 dependencyCheck additionalArguments: '''--scan target/ 
                   --format ALL 
                   --nvdApiKey "dedd5531-0050-4e00-b986-06348bdde990"
@@ -44,7 +46,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "docker build"
-                sh 'docker image prune -f'
+                sh 'docker image prune -a'
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_VERSION} -t ${IMAGE_NAME}:latest ."
             }
         }
@@ -53,8 +55,33 @@ pipeline {
             steps {
                 echo "trivy scan"
                 sh "trivy image --format table -o report.html ${IMAGE_NAME}:${IMAGE_VERSION}"
+            }
+        }
+        stage('Test application') {
+            steps {
+                echo "Application testing"
+                sh "docker run -d --name=test-application -p 80:80 ${IMAGE_NAME}:${IMAGE_VERSION}"
               }
-          }
+        }
+        stage('Push Image') {
+            steps {
+                timeout(time: 1, unit: 'DAYS'){
+                    input {
+                       message 'Is the application build ok?'
+                       ok 'Approved '
+                       submitter 'admin'
+                   }
+                }      
+            }
+        }
+        stage('DockerHub image push') {
+            steps {
+                echo "DockerHub Push"
+                sh "docker rm -f test-application"
+                sh 'docker login -u "danushvithiyarth" -p "$Docker_pass" docker.io'
+                sh "docker push ${IMAGE_NAME} --all-tags"
+              }
+        }
        }
         post {
             always {
