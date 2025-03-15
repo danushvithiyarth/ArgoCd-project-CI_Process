@@ -4,7 +4,7 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "danushvithiyarth/argocdproject"
-        IMAGE_VERSION = "v${BUILD_NUMBER}"
+        IMAGE_VERSION = "v${env.BUILD_NUMBER}"
     }
 
     tools {
@@ -55,5 +55,15 @@ pipeline {
                 sh "trivy image --format table -o report.html ${IMAGE_NAME}:${IMAGE_VERSION}"
             }
         }
+        post {
+            always {
+                publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', 
+                             reportFiles: 'dependency-check-jenkins.html', reportName: 'HTML Report', reportTitles: '', 
+                             useWrapperFileDirectly: true])
+                publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './',
+                             reportFiles: 'report.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+            }
+       }
+
     }
 }
