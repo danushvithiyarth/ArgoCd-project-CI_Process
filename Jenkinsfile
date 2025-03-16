@@ -74,6 +74,9 @@ pipeline {
         }
 
         stage('DockerHub image push') {
+            when {
+                branch 'main'
+            }
             steps {
                 echo "DockerHub Push"
                 sh "docker rm -f test-application"
