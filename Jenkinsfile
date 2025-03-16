@@ -44,11 +44,25 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image on main') {
+            when {
+                branch 'main'
+            }
             steps {
-                echo "docker build"
+                echo "Building Docker image on main branch"
                 sh 'docker image prune -af'
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_VERSION} -t ${IMAGE_NAME}:latest ."
+            }
+        }
+
+        stage('Build Docker Image on feature') {
+            when {
+                branch 'feature-*'
+            }
+            steps {
+                echo "Building Docker image on feature branch"
+                sh 'docker image prune -af'
+                sh "docker build -t ${IMAGE_NAME_FEATURE}:${IMAGE_VERSION} -t ${IMAGE_NAME_FEATURE}:latest ."
             }
         }
 
@@ -71,7 +85,7 @@ pipeline {
 
         stage('Test application - Feature') {
             when {
-                expression { env.BRANCH_NAME.startsWith('feature-') }
+                branch 'feature-*'
             }
             steps {
                 echo "Application testing on feature branch."
@@ -103,7 +117,7 @@ pipeline {
 
         stage('DockerHub image push - Feature') {
             when {
-                expression { env.BRANCH_NAME.startsWith('feature-') }
+                branch 'feature-*'
             }
             steps {
                 echo "DockerHub push (feature branch)..."
