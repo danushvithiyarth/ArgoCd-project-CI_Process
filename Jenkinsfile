@@ -4,6 +4,7 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "danushvithiyarth/argocdproject"
+        IMAGE_NAME_FEATURE = "danushvithiyarth/argocdproject-feature"
         IMAGE_VERSION = "v${env.BUILD_NUMBER}"
     }
 
@@ -58,10 +59,23 @@ pipeline {
             }
         }
 
-        stage('Test application') {
+        stage('Test application - Main') {
+            when {
+                branch 'main'
+            }
             steps {
-                echo "Application testing"
+                echo "Application testing on main branch"
                 sh "docker run -d --name=test-application -p 80:80 ${IMAGE_NAME}:${IMAGE_VERSION}"
+            }
+        }
+
+        stage('Test application - Feature') {
+            when {
+                expression { env.BRANCH_NAME.startsWith('feature-') }
+            }
+            steps {
+                echo "Application testing on feature branch."
+                sh "docker run -d --name=feature-test-application -p 80:80 ${IMAGE_NAME_FEATURE}:${IMAGE_VERSION}"
             }
         }
 
@@ -73,17 +87,31 @@ pipeline {
             }
         }
 
-        stage('DockerHub image push') {
+        stage('DockerHub image push - Main') {
             when {
                 branch 'main'
             }
             steps {
-                echo "DockerHub Push"
+                echo "DockerHub push (main branch)..."
                 sh "docker rm -f test-application"
                 withCredentials([usernamePassword(credentialsId: 'Docker_pass', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                      sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} docker.io"
+                    sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} docker.io"
                 }
                 sh "docker push ${IMAGE_NAME} --all-tags"
+            }
+        }
+
+        stage('DockerHub image push - Feature') {
+            when {
+                expression { env.BRANCH_NAME.startsWith('feature-') }
+            }
+            steps {
+                echo "DockerHub push (feature branch)..."
+                sh "docker rm -f feature-test-application"
+                withCredentials([usernamePassword(credentialsId: 'Docker_pass', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} docker.io"
+                }
+                sh "docker push ${IMAGE_NAME_FEATURE} --all-tags"
             }
         }
     }
