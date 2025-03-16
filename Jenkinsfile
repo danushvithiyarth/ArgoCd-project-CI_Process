@@ -62,15 +62,24 @@ pipeline {
             steps {
                 echo "Building Docker image on feature branch"
                 sh 'docker image prune -af'
-                sh "docker build -t ${IMAGE_NAME_FEATURE}:${IMAGE_VERSION} -t ${IMAGE_NAME_FEATURE}:latest ."
+                sh "docker build -t ${IMAGE_NAME_FEATURE}:${IMAGE_VERSION} ."
             }
         }
 
         stage('Trivy-Check') {
-            steps {
-                echo "trivy scan"
-                sh "trivy image --format table -o report.html ${IMAGE_NAME}:${IMAGE_VERSION}"
-            }
+           steps {
+             script {
+                 if (env.BRANCH_NAME == 'main') {
+                    echo "Running Trivy scan on main branch..."
+                    sh "trivy image --format table -o report.html ${IMAGE_NAME}:${IMAGE_VERSION}"
+                 } else if (env.BRANCH_NAME.startsWith('feature-')) {
+                    echo "Running Trivy scan on feature branch..."
+                    sh "trivy image --format table -o report.html ${IMAGE_NAME_FEATURE}:${IMAGE_VERSION}"
+                 } else {
+                    echo "Branch is neither main nor a feature branch. Skipping Trivy scan."
+                 }
+              }
+           }
         }
 
         stage('Test application - Main') {
