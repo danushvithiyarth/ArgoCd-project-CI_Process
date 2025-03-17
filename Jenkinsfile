@@ -143,10 +143,11 @@ pipeline {
             }
             steps {
                 echo 'Cloning repo'
-                sh "git clone https://github.com/danushvithiyarth/GitOps-Manifest-Repo.git"
+                sh 'rm -rf ArgoCd-project-CD_Process'
+                sh "git clone https://github.com/danushvithiyarth/ArgoCd-project-CD_Process.git"
 
                 echo 'Updating repo'
-                dir("GitOps-Manifest-Repo/manifest"){
+                dir("ArgoCd-project-CD_Process/manifest"){
                   sh 'sed -i "s#danushvithiyarth/argocdproject:.*#${IMAGE_NAME}:${IMAGE_VERSION}#g" deployment.yaml'
                   sh 'cat deployment.yaml'
 
@@ -156,7 +157,7 @@ pipeline {
                   sh 'git add deployment.yaml'
                   sh 'git commit -m "Update image tag to ${IMAGE_NAME}:${IMAGE_VERSION}"'
                   withCredentials([usernamePassword(credentialsId: 'github-cerds', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                     sh 'git remote set-url origin https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/danushvithiyarth/GitOps-Manifest-Repo.git'
+                     sh 'git remote set-url origin https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/danushvithiyarth/ArgoCd-project-CD_Process.git'
                      sh 'git push origin main'
                   }
                }     
