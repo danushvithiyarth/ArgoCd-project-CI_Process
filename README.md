@@ -4,7 +4,7 @@
 
 This project demonstrates the DevOps and GitOps methodology using Kubernetes and ArgoCD for continuous deployment. The CI process is responsible for building, testing, scanning, and pushing containerized application images to DockerHub. The project utilizes Jenkins, Terraform, Docker, Trivy, SonarQube, and OWASP Dependency-Check to ensure a robust CI pipeline.
 
-The application source code is taken from Boardgame Repository. This repository primarily focuses on the CI (Continuous Integration) process, where application code is built and tested before being pushed to the container registry.
+The application source code is taken from public repository - "https://github.com/jaiswaladi246/Boardgame.git". This repository primarily focuses on the CI (Continuous Integration) process, where application code is built and tested before being pushed to the container registry. This repository contains Source code, Dockerfile, Jenkinsfile, Terraform script and all Activity logs.
 
 ## Technologies Used
 
@@ -126,11 +126,11 @@ DockerHub - For storing the containerized application images
 
 DevOps Implementation: Danush Vithiyarth Jaiganesh - DevOps Engineer
 
-Application Source Code: Boardgame Repository
+Application Source Code: Boardgame Repository - "https://github.com/jaiswaladi246/Boardgame.git"
 
 CI/CD Automation & Infrastructure as Code: Danush Vithiyarth Jaiganesh - DevOps Engineer
 
 ## Note:
-This repository focuses on the CI (Continuous Integration) process for automating application build and validation before deployment. The CD (Continuous Deployment) process is handled separately in the CD Process Repository.
+This repository focuses on the CI (Continuous Integration) process for automating application build and validation before deployment. The CD (Continuous Deployment) process is handled separately in the CD Process Repository - "https://github.com/danushvithiyarth/ArgoCd-project-CD_Process.git".
 
        
