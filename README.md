@@ -1,53 +1,136 @@
-# BoardgameListingWebApp
+# ArgoCD Project - CI Process
 
-## Description
+## Introduction
 
-**Board Game Database Full-Stack Web Application.**
-This web application displays lists of board games and their reviews. While anyone can view the board game lists and reviews, they are required to log in to add/ edit the board games and their reviews. The 'users' have the authority to add board games to the list and add reviews, and the 'managers' have the authority to edit/ delete the reviews on top of the authorities of users.  
+This project demonstrates the DevOps and GitOps methodology using Kubernetes and ArgoCD for continuous deployment. The CI process is responsible for building, testing, scanning, and pushing containerized application images to DockerHub. The project utilizes Jenkins, Terraform, Docker, Trivy, SonarQube, and OWASP Dependency-Check to ensure a robust CI pipeline.
 
-## Technologies
+The application source code is taken from Boardgame Repository. This repository primarily focuses on the CI (Continuous Integration) process, where application code is built and tested before being pushed to the container registry.
 
-- Java
-- Spring Boot
-- Amazon Web Services(AWS) EC2
-- Thymeleaf
-- Thymeleaf Fragments
-- HTML5
-- CSS
-- JavaScript
-- Spring MVC
-- JDBC
-- H2 Database Engine (In-memory)
-- JUnit test framework
-- Spring Security
-- Twitter Bootstrap
-- Maven
+## Technologies Used
 
-## Features
+Terraform - To provision AWS infrastructure
 
-- Full-Stack Application
-- UI components created with Thymeleaf and styled with Twitter Bootstrap
-- Authentication and authorization using Spring Security
-  - Authentication by allowing the users to authenticate with a username and password
-  - Authorization by granting different permissions based on the roles (non-members, users, and managers)
-- Different roles (non-members, users, and managers) with varying levels of permissions
-  - Non-members only can see the boardgame lists and reviews
-  - Users can add board games and write reviews
-  - Managers can edit and delete the reviews
-- Deployed the application on AWS EC2
-- JUnit test framework for unit testing
-- Spring MVC best practices to segregate views, controllers, and database packages
-- JDBC for database connectivity and interaction
-- CRUD (Create, Read, Update, Delete) operations for managing data in the database
-- Schema.sql file to customize the schema and input initial data
-- Thymeleaf Fragments to reduce redundancy of repeating HTML elements (head, footer, navigation)
+Jenkins - For automating CI processes
 
-## How to Run
+Docker - To containerize the Java application
 
-1. Clone the repository
-2. Open the project in your IDE of choice
-3. Run the application
-4. To use initial user data, use the following credentials.
-  - username: bugs    |     password: bunny (user role)
-  - username: daffy   |     password: duck  (manager role)
-5. You can also sign-up as a new user and customize your role to play with the application! 😊
+Maven - For dependency management and build
+
+OWASP Dependency-Check - For security vulnerability analysis
+
+SonarQube - For code quality and code coverage analysis
+
+Trivy - For container image vulnerability scanning
+
+DockerHub - For storing the containerized application images
+
+## Workflow
+
+### 1. Infrastructure Setup
+
+- Used Terraform to create AWS resources:
+
+    VPC, Public and Private Subnets
+
+    Internet Gateway, NAT Gateway, and Route Tables
+
+- EC2 Instances:
+
+    CI Machine for building and pushing images
+
+    CD Machine for Kubernetes deployments
+
+### 2. CI Process on the CI Machine
+
+- Build and Test the Application
+
+   * Used Maven to install dependencies and build the Java application.
+
+   * Performed security dependency scanning using OWASP Dependency-Check.
+     
+   * Checked code quality using SonarQube.
+
+- Containerization & Image Scanning
+
+   * Used Docker multistage build to create an optimized application image.
+
+   * Scanned the Docker image for vulnerabilities using Trivy.
+    
+- Local Deployment Test
+
+   * Deployed the image using Docker Compose for testing.
+
+   * Implemented a manual input prompt to verify if the deployment was successful.
+
+- Pushing Image to DockerHub
+
+   * Tagged the Docker image with latest and build ID.
+
+   * Pushed the image to DockerHub.
+
+- Reports & Notifications
+  
+   * Reports from Trivy and OWASP are generated and published.
+
+   * Jenkins logs are monitored using Blue Ocean UI.  
+
+### 3. GitOps Workflow Implementation
+
+- Created a feature branch (feature-1) for code modifications.
+
+- Added additional Jenkins pipeline stages to support branch-based CI workflows.
+
+- Once validated, merged the feature branch into the main branch.
+
+- The final stage updated the CD process repository by modifying the Kubernetes deployment manifest.
+
+## Troubleshooting
+
+### 1.Terraform VPC Setup Issue
+
+- Initially, the created subnets did not assign a public IP by default.
+
+- Solution: Added associate_public_ip_address = true to ensure EC2 instances in the public subnet receive a public IP.
+
+### 2.OWASP Dependency Check Issue
+
+- The dependency check was failing intermittently without completing.
+
+- Solution: Used an NVD API key, which resolved the issue and allowed OWASP to complete successfully.
+
+### 3.Docker Image Cleanup Issue
+
+- docker image prune -a was not removing old images due to the manual confirmation prompt.
+
+- Solution: Used docker image prune -af to forcefully delete all unused images.
+
+### 4.Automating PR Creation with GitHub CLI/API
+
+- Attempted to automate pull request (PR) creation by API but was unsuccessful.
+
+- Solution: Manually created the PR via GitHub UI.
+
+- Alternate Fix: Implement an admin-only input dialog box in Jenkins to approve and trigger a git merge stage automatically.
+
+### 5.Disk Space Management on CI Machine
+
+- After multiple builds, the instance ran out of disk space.
+
+- Solution:
+
+  * Deleted SonarQube projects to free up space.
+
+  * Used docker system prune -a -f --volumes to remove unused Docker images, containers, and volumes
+
+## Contributors & Credits
+
+DevOps Implementation: Danush Vithiyarth Jaiganesh - DevOps Engineer
+
+Application Source Code: Boardgame Repository
+
+CI/CD Automation & Infrastructure as Code: Danush Vithiyarth Jaiganesh - DevOps Engineer
+
+## Note:
+This repository focuses on the CI (Continuous Integration) process for automating application build and validation before deployment. The CD (Continuous Deployment) process is handled separately in the CD Process Repository.
+
+       
