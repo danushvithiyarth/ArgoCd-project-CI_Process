@@ -49,8 +49,8 @@ The application source code is based on: [Boardgame](https://github.com/jaiswala
 
 ## 📝 Activity Logs
 
-- All project steps, screenshots, and Jenkins logs are stored in the `logs` branch.
-- Includes visual reference of Docker builds, test runs, and vulnerability scan reports.
+- All project steps, screenshots, and Jenkins logs are stored in the `Activity-Logs` folder in this CI repository.
+- Includes visual references of Docker builds, test runs, and vulnerability scan reports.
 
 ---
 
